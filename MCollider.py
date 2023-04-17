@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 # @Мартин.
 import sys,argparse,textwrap,hashlib
+
+import requests
 from loguru import logger
 from multiprocessing.dummy import Pool as ThreadPool
 
@@ -42,29 +44,26 @@ class Main_Class():
 
     def run(self):
         if self.MD5:
-            logger.warning("Cracking containing MD5 values of:"+self.MD5)
+            logger.warning("Cracking containing MD5 values of:" + self.MD5)
             pool = ThreadPool()
-            for i in range(10):
-                self.CODE_LIST.append( str(10000000 * i)+ ':' + str(10000000 * (i + 1)))
+            for i in range(100):
+                self.CODE_LIST.append(str(10000000 * i) + ':' + str(10000000 * (i + 1)))
             logger.info("Cracking....")
             pool.map(self.Crack_MD5, self.CODE_LIST)
             pool.close()
             pool.join()
 
+    def Get_MD5(self, note):
+        return hashlib.md5(note.encode('utf-8')).hexdigest()
 
-    def Get_MD5(self,note):
-        return hashlib.md5(str(note).encode('utf-8')).hexdigest()
-
-
-    def Crack_MD5(self,scope):
-        start_num=int(scope.split(':')[0])
-        end_num=int(scope.split(':')[-1])
+    def Crack_MD5(self, scope):
+        start_num = int(scope.split(':')[0])
+        end_num = int(scope.split(':')[-1])
         logger.info(f"[Runing] Decoding range {start_num}-{end_num} pure digits")
         for i in range(start_num, end_num):
-            if self.MD5 in self.Get_MD5(i):
-                logger.warning(f"{i} is contained by MD5:{self.Get_MD5(i)}")
+            if self.MD5 in self.Get_MD5(str(i)):
+                logger.warning(f"{i} is contained by MD5:{self.Get_MD5(str(i))}")
                 break
-
 
 def main():
     print(Logo,"\n",Title)
